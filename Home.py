@@ -30,17 +30,19 @@ class HomeWindow(QMainWindow):
         self.booking_button = QPushButton("Prenotazione appelli", self)
         self.booking_button.setFixedSize(300, 40)  # Dimensioni
         self.booking_button.setStyleSheet("background-color: green; color: white; border-radius: 5px; font-size: 18px")  # Stile del bottone
+        self.booking_button.clicked.connect(self.book_exam) # Funzione del bottone
 
         # Pulsante di visualizzazione prossimi esami
         self.view_button = QPushButton("Visualizzazione prossimi esami", self)
         self.view_button.setFixedSize(300, 40)  # Dimensioni
         self.view_button.setStyleSheet("background-color: green; color: white; border-radius: 5px; font-size: 18px")  # Stile del bottone
+        self.view_button.clicked.connect(self.show_next_exams) # Funzione del bottone
 
         # Pulsante di visualizzazione degli esami dati
         self.career_button = QPushButton("Visualizzazione libretto", self)
         self.career_button.setFixedSize(300, 40)  # Dimensioni
         self.career_button.setStyleSheet("background-color: green; color: white; border-radius: 5px; font-size: 18px")  # Stile del bottone
-        self.career_button.clicked.connect(self.show_given_exams)
+        self.career_button.clicked.connect(self.show_given_exams) # Funzione del bottone
 
         # Layout
         self.layout = QVBoxLayout()
@@ -53,6 +55,12 @@ class HomeWindow(QMainWindow):
         self.window = QWidget()
         self.window.setLayout(self.layout)
         self.setCentralWidget(self.window)
+
+    def book_exam(self): # Funzione di prenotazione di un appello per lo studente
+        print("Prenota")
+
+    def show_next_exams(self): # Funzione di visualizzazione degli appelli prenotati dallo studente
+        print("Next exam")
 
     def show_given_exams(self): # Funzione di visualizzazione degli esami dati dallo studente
         try:
