@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLab
 from mysql.connector import Error
 
 from Career import CareerPage
+from Booking import BookingPage
+from NextExams import NextExamsPage
 from DatabaseConnection import connection
 
 
@@ -13,11 +15,13 @@ class HomeWindow(QMainWindow):
         self.matricola = matricola # Matricola dello studente loggato
 
         self.career_page = None # Pagina di visualizzazione degli esami dati
+        self.booking_page = None # Pagina di visualizzazione degli appelli prenotabili
+        self.next_exams_page = None # Pagina di visualizzazione degli appelli prenotati
 
         # Finestra
         self.setWindowTitle("Home")  # Titolo della finestra
         self.setFixedSize(800, 600)  # Dimensioni della finestra
-        self.setStyleSheet("background-color: white;")  # Stile della finestra
+        self.setStyleSheet("background-color: white; font-family: Helvetica")  # Stile della finestra
 
         # Logo
         self.logo = QLabel()
@@ -57,23 +61,49 @@ class HomeWindow(QMainWindow):
         self.setCentralWidget(self.window)
 
     def book_exam(self): # Funzione di prenotazione di un appello per lo studente
-        print("Prenota")
+        try:
+            conn = connection()  # Connessione al database
+            cursor = conn.cursor()  # Cursore per la query
+            query = ("")  # Query da eseguire
+            cursor.execute(query, )  # Esegue la query
+            given_exams = cursor.fetchall()  # Risultati della query
+            self.close()  # Chiude la home page
+            self.booking_page = BookingPage()  # Crea una finestra per visualizzare gli esami superati
+            self.booking_page.show()  # Mostra gli appelli prenotabili
+        except Error as e:
+            print(f"Errore durante la connessione al database: {e}")
+        finally:
+            if conn.is_connected():
+                conn.close()  # Chiude la connessione al database
 
     def show_next_exams(self): # Funzione di visualizzazione degli appelli prenotati dallo studente
-        print("Next exam")
+        try:
+            conn = connection()  # Connessione al database
+            cursor = conn.cursor()  # Cursore per la query
+            query = ("SELECT A.DATAESAME, A.NOMEESAME, A.CORSO FROM APPELLI A JOIN PRENOTA P ON A.NOMEESAME = P.NOMEESAME"
+                     " AND A.CORSO = P.CORSO WHERE P.MATRICOLA = %s")  # Query da eseguire
+            cursor.execute(query, (self.matricola, ))  # Esegue la query
+            next_exams = cursor.fetchall()  # Risultati della query
+            self.close()  # Chiude la home page
+            self.next_exams_page = NextExamsPage(next_exams)  # Crea una finestra per visualizzare gli esami superati
+            self.next_exams_page.show()  # Mostra gli appelli prenotati
+        except Error as e:
+            print(f"Errore durante la connessione al database: {e}")
+        finally:
+            if conn.is_connected():
+                conn.close()  # Chiude la connessione al database
 
     def show_given_exams(self): # Funzione di visualizzazione degli esami dati dallo studente
         try:
             conn = connection() # Connessione al database
             cursor = conn.cursor()  # Cursore per la query
-            query = ("SELECT A.NOMEESAME, A.CORSO, SP.VOTO, A.DATAESAME FROM STUDENTI ST JOIN SUPERA SP ON ST.MATRICOLA = SP.MATRICOLA"
-                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.CORSO = A.CORSO WHERE ST.MATRICOLA = %s")  # Query da eseguire
+            query = ("SELECT A.NOMEESAME, A.CORSO, SP.VOTO, A.DATAESAME FROM SUPERA SP "
+                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.CORSO = A.CORSO WHERE SP.MATRICOLA = %s")  # Query da eseguire
             cursor.execute(query, (self.matricola, )) # Esegue la query
             given_exams = cursor.fetchall()  # Risultati della query
             self.close() # Chiude la home page
             self.career_page = CareerPage(given_exams) # Crea una finestra per visualizzare gli esami superati
             self.career_page.show() # Mostra gli esami superati
-
         except Error as e:
             print(f"Errore durante la connessione al database: {e}")
         finally:

@@ -16,7 +16,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         # Finestra
         self.setWindowTitle("Login") # Titolo della finestra
         self.setFixedSize(800, 600) # Dimensioni della finestra
-        self.setStyleSheet("background-color: white;") # Stile della finestra
+        self.setStyleSheet("background-color: white; font-family: Helvetica") # Stile della finestra
 
         # Logo
         self.logo = QLabel()

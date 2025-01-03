@@ -2,12 +2,12 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget
 
 
-class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto dello studente
-    def __init__(self, given_exams):
+class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
+    def __init__(self):
         super().__init__()
 
         # Finestra
-        self.setWindowTitle("Home")  # Titolo della finestra
+        self.setWindowTitle("Prenotazione Appelli")  # Titolo della finestra
         self.setFixedSize(800, 600)  # Dimensioni della finestra
         self.setStyleSheet("background-color: white; font-family: Helvetica")  # Stile della finestra
 
