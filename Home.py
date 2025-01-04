@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLabel
 from mysql.connector import Error
+from datetime import datetime
 
 from Career import CareerPage
 from Booking import BookingPage
@@ -33,25 +34,44 @@ class HomeWindow(QMainWindow):
         # Pulsante di prenotazione ad un appello
         self.booking_button = QPushButton("Prenotazione appelli", self)
         self.booking_button.setFixedSize(300, 40)  # Dimensioni
-        self.booking_button.setStyleSheet("background-color: green; color: white; border-radius: 5px; font-size: 18px")  # Stile del bottone
         self.booking_button.clicked.connect(self.book_exam) # Funzione del bottone
 
         # Pulsante di visualizzazione prossimi esami
         self.view_button = QPushButton("Visualizzazione prossimi esami", self)
         self.view_button.setFixedSize(300, 40)  # Dimensioni
-        self.view_button.setStyleSheet("background-color: green; color: white; border-radius: 5px; font-size: 18px")  # Stile del bottone
         self.view_button.clicked.connect(self.show_next_exams) # Funzione del bottone
 
         # Pulsante di visualizzazione degli esami dati
         self.career_button = QPushButton("Visualizzazione libretto", self)
         self.career_button.setFixedSize(300, 40)  # Dimensioni
-        self.career_button.setStyleSheet("background-color: green; color: white; border-radius: 5px; font-size: 18px")  # Stile del bottone
         self.career_button.clicked.connect(self.show_given_exams) # Funzione del bottone
+
+        # Stile dei bottoni
+        button_style = """
+            QPushButton {
+                background-color: green;
+                color: white;
+                border-radius: 5px;
+                font-size: 18px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: darkgreen;
+            }
+            QPushButton:pressed {
+                background-color: #005500;
+            }
+        """
+        self.booking_button.setStyleSheet(button_style)
+        self.view_button.setStyleSheet(button_style)
+        self.career_button.setStyleSheet(button_style)
 
         # Layout
         self.layout = QVBoxLayout()
         self.layout.setAlignment(Qt.AlignCenter)  # Allineamento al centro di ogni widget
         self.layout.setSpacing(20)  # Spaziatura tra i widget
+
+        # Aggiunta dei widget al layout
         self.layout.addWidget(self.logo)
         self.layout.addWidget(self.booking_button)
         self.layout.addWidget(self.view_button)
@@ -64,11 +84,16 @@ class HomeWindow(QMainWindow):
         try:
             conn = connection()  # Connessione al database
             cursor = conn.cursor()  # Cursore per la query
-            query = ("")  # Query da eseguire
-            cursor.execute(query, )  # Esegue la query
-            given_exams = cursor.fetchall()  # Risultati della query
+            query = "SELECT CORSOSTUDENTE FROM STUDENTI WHERE MATRICOLA = %s" # Query per estrapolare il corso dello studente
+            cursor.execute(query, (self.matricola, )) # Esegue la query
+            student_course = cursor.fetchone() # Salva il risultato
+            query = ("SELECT NOMEESAME, CORSOESAME, DATAESAME FROM APPELLI"
+                     " WHERE CORSOESAME = %s AND DATAESAME > %s") # Query per estrapolare gli appelli prenotabili
+            current_date = datetime.now().date() # Data corrente
+            cursor.execute(query, (student_course[0], current_date)) # Esegue la query
+            available_exams = cursor.fetchall() # Risultati della query
             self.close()  # Chiude la home page
-            self.booking_page = BookingPage()  # Crea una finestra per visualizzare gli esami superati
+            self.booking_page = BookingPage(available_exams, self)  # Crea una finestra per visualizzare gli esami superati
             self.booking_page.show()  # Mostra gli appelli prenotabili
         except Error as e:
             print(f"Errore durante la connessione al database: {e}")
@@ -80,12 +105,13 @@ class HomeWindow(QMainWindow):
         try:
             conn = connection()  # Connessione al database
             cursor = conn.cursor()  # Cursore per la query
-            query = ("SELECT A.DATAESAME, A.NOMEESAME, A.CORSO FROM APPELLI A JOIN PRENOTA P ON A.NOMEESAME = P.NOMEESAME"
-                     " AND A.CORSO = P.CORSO WHERE P.MATRICOLA = %s")  # Query da eseguire
-            cursor.execute(query, (self.matricola, ))  # Esegue la query
+            query = ("SELECT A.NOMEESAME, A.CORSOESAME, A.DATAESAME FROM APPELLI A JOIN PRENOTA P ON A.NOMEESAME = P.NOMEESAME"
+                     " AND A.CORSOESAME = P.CORSOESAME WHERE P.MATRICOLA = %s AND A.DATAESAME > %s")  # Query da eseguire
+            current_date = datetime.now().date()  # Data corrente
+            cursor.execute(query, (self.matricola, current_date))  # Esegue la query
             next_exams = cursor.fetchall()  # Risultati della query
             self.close()  # Chiude la home page
-            self.next_exams_page = NextExamsPage(next_exams)  # Crea una finestra per visualizzare gli esami superati
+            self.next_exams_page = NextExamsPage(next_exams, self)  # Crea una finestra per visualizzare gli esami superati
             self.next_exams_page.show()  # Mostra gli appelli prenotati
         except Error as e:
             print(f"Errore durante la connessione al database: {e}")
@@ -97,12 +123,12 @@ class HomeWindow(QMainWindow):
         try:
             conn = connection() # Connessione al database
             cursor = conn.cursor()  # Cursore per la query
-            query = ("SELECT A.NOMEESAME, A.CORSO, SP.VOTO, A.DATAESAME FROM SUPERA SP "
-                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.CORSO = A.CORSO WHERE SP.MATRICOLA = %s")  # Query da eseguire
+            query = ("SELECT A.NOMEESAME, A.CORSOESAME, SP.VOTO, A.DATAESAME FROM SUPERA SP "
+                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.CORSOESAME = A.CORSOESAME WHERE SP.MATRICOLA = %s")  # Query da eseguire
             cursor.execute(query, (self.matricola, )) # Esegue la query
             given_exams = cursor.fetchall()  # Risultati della query
             self.close() # Chiude la home page
-            self.career_page = CareerPage(given_exams) # Crea una finestra per visualizzare gli esami superati
+            self.career_page = CareerPage(given_exams, self) # Crea una finestra per visualizzare gli esami superati
             self.career_page.show() # Mostra gli esami superati
         except Error as e:
             print(f"Errore durante la connessione al database: {e}")

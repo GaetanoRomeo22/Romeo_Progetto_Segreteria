@@ -30,21 +30,47 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.username_label.setStyleSheet("color: black; font-size: 16px") # Stile della casella di username
         # self.username_label.setAlignment(Qt.AlignCenter) # Allineamento al centro
         self.username = QLineEdit() # Casella di testo per l'username
-        # username.setPlaceholderText("Matricola") # Placeholder
+        self.username.setPlaceholderText("Inserisci la tua matricola") # Placeholder
         self.username.setMaxLength(10) # Lunghezza massima del testo
         self.username.setFixedSize(300, 40) # Dimensioni della casella di testo
-        self.username.setStyleSheet("background-color: #f7f7f7; color: black; font-size: 16px")
+        self.username.setStyleSheet("""
+            QLineEdit {
+                background-color: #f7f7f7;
+                color: black;
+                font-size: 16px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            QLineEdit:focus {
+                border: 1px solid #00aaff;
+                background-color: #ffffff;
+            }
+        """)
 
         # Password
         self.password_label = QLabel("Password") # Etichetta per la password
         self.password_label.setStyleSheet("color: black; font-size: 16px")  # Stile della casella di password
         # self.password_label.setAlignment(Qt.AlignCenter) # Allineamento al centro
         self.password = QLineEdit()  # Casella di testo per la password
-        # self.password.setPlaceholderText("Password")  # Placeholder
+        self.password.setPlaceholderText("Inserisci la tua password")  # Placeholder
         self.password.setMaxLength(30)  # Lunghezza massima del testo
         self.password.setEchoMode(QLineEdit.Password) # Nasconde la password
         self.password.setFixedSize(300, 40) # Dimensioni della casella di testo
-        self.password.setStyleSheet("background-color: #f7f7f7; color: black; font-size: 16px")
+        self.password.setStyleSheet("""
+            QLineEdit {
+                background-color: #f7f7f7;
+                color: black;
+                font-size: 16px;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+            QLineEdit:focus {
+                border: 1px solid #00aaff;
+                background-color: #ffffff;
+            }
+        """)
 
         # Messaggio di errore
         self.error_message = QLabel("Accesso non riuscito") # Etichetta per il messaggio di errore
@@ -56,13 +82,29 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         # Pulsante di login
         self.login_button = QPushButton("Accedi") # Testo del bottone
         self.login_button.setFixedSize(300, 40) # Dimensioni
-        self.login_button.setStyleSheet("background-color: green; color: white; border-radius: 5px; font-size: 18px") # Stile del bottone
+        self.login_button.setStyleSheet("""
+            QPushButton {
+                background-color: green;
+                color: white;
+                border-radius: 5px;
+                font-size: 18px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: darkgreen;
+            }
+            QPushButton:pressed {
+                background-color: #005500;
+            }
+        """) # Stile del bottone
         self.login_button.clicked.connect(self.handle_login) # Funzione del bottone
 
         # Layout
         self.layout = QVBoxLayout()
         self.layout.setAlignment(Qt.AlignCenter) # Allineamento al centro di ogni widget
         self.layout.setSpacing(20) # Spaziatura tra i widget
+
+        # Aggiunta dei widget al layout
         self.layout.addWidget(self.logo)
         self.layout.addWidget(self.username_label)
         self.layout.addWidget(self.username)
