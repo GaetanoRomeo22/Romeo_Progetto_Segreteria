@@ -1,5 +1,6 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QPushButton, QLabel, \
+    QHeaderView
 from datetime import datetime
 
 
@@ -14,11 +15,25 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
         self.setFixedSize(800, 600)  # Dimensioni della finestra
         self.setStyleSheet("background-color: white; font-family: Helvetica")  # Stile della finestra
 
+        # Intestazione
+        self.header_label = QLabel("Appelli Disponibili")
+        self.header_label.setAlignment(Qt.AlignCenter)
+        self.header_label.setStyleSheet("""
+            font-size: 20px;
+            font-weight: bold;
+            color: #00796b;
+            margin-bottom: 10px;
+        """)
+
         # Tabella
         self.table = QTableWidget()
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(["Nome Esame", "Corso", "Data Appello"])
         self.table.setRowCount(len(available_exams))
+
+        # Ridimensionamento uniforme delle colonne
+        header = self.table.horizontalHeader()
+        header.setSectionResizeMode(QHeaderView.Stretch)
 
         # Popolamento della tabella
         for row_index, exam in enumerate(available_exams):
@@ -30,28 +45,34 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
                 item.setTextAlignment(Qt.AlignCenter)
                 self.table.setItem(row_index, col_index, item)
 
-        self.table.setStyleSheet(  # Stile della tabella
-            """
+        # Stile tabella
+        self.table.setStyleSheet("""
             QTableWidget {
-                border: 2px solid #cccccc;
+                border: 1px solid #cccccc;
                 background-color: #ffffff;
                 color: #333333;
                 gridline-color: #cccccc;
+                alternate-background-color: #f9f9f9;
             }
             QHeaderView::section {
-                background-color: #f2f2f2;
-                color: #333333;
+                background-color: #00796b;
+                color: white;
                 font-weight: bold;
+                padding: 4px;
                 border: 1px solid #cccccc;
             }
             QTableWidget::item {
+                padding: 5px;
                 border: 1px solid #cccccc;
             }
-            """
-        )
+            QTableWidget::item:selected {
+                background-color: #c8e6c9;
+                color: #333333;
+            }
+        """)
+        self.table.setAlternatingRowColors(True)  # Abilita i colori alternati
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)  # Impedisce la modifica dei dati
         self.table.setSelectionBehavior(QTableWidget.SelectRows)  # Seleziona intere righe
-        self.table.horizontalHeader().setStretchLastSection(True)  # La colonna finale riempie lo spazio
         self.table.verticalHeader().setVisible(False)  # Nasconde l'indice delle righe
 
         # Pulsante per tornare alla home page
@@ -59,17 +80,18 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
         self.back_button.setFixedSize(300, 40)  # Dimensioni
         self.back_button.setStyleSheet("""
             QPushButton {
-                background-color: green;
+                background-color: #00796b;
                 color: white;
-                border-radius: 5px;
-                font-size: 18px;
+                border-radius: 10px;
+                font-size: 16px;
                 padding: 10px;
+                border: none;
             }
             QPushButton:hover {
-                background-color: darkgreen;
+                background-color: #004d40;
             }
             QPushButton:pressed {
-                background-color: #005500;
+                background-color: #00251a;
             }
         """)  # Stile del bottone
         self.back_button.clicked.connect(self.show_home_page)  # Funzione del bottone
@@ -80,6 +102,7 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
         self.layout.setSpacing(20)  # Spaziatura tra i widget
 
         # Aggiunta dei widget al layout
+        self.layout.insertWidget(0, self.header_label)
         self.layout.addWidget(self.table)
         self.layout.addWidget(self.back_button, alignment=Qt.AlignCenter)
         self.window = QWidget()

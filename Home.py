@@ -49,17 +49,18 @@ class HomeWindow(QMainWindow):
         # Stile dei bottoni
         button_style = """
             QPushButton {
-                background-color: green;
+                background-color: #00796b;
                 color: white;
-                border-radius: 5px;
-                font-size: 18px;
+                border-radius: 10px;
+                font-size: 16px;
                 padding: 10px;
+                border: none;
             }
             QPushButton:hover {
-                background-color: darkgreen;
+                background-color: #004d40;
             }
             QPushButton:pressed {
-                background-color: #005500;
+                background-color: #00251a;
             }
         """
         self.booking_button.setStyleSheet(button_style)

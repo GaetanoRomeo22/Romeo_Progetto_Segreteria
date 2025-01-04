@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMainWindow
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QMainWindow, QHBoxLayout
 from mysql.connector import Error
 
 from Home import HomeWindow
@@ -72,6 +72,32 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
             }
         """)
 
+        # Pulsante mostra/nascondi password
+        self.toggle_password_button = QPushButton("👁")
+        self.toggle_password_button.setFixedSize(40, self.password.height())
+        self.toggle_password_button.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                font-size: 16px;
+                color: #555;
+            }
+            QPushButton:hover {
+                background-color: #f0f0f0;
+                color: #00796b;
+                border-radius: 5px;
+            }
+            QPushButton:pressed {
+                background-color: #e0e0e0;
+            }
+        """)
+        self.toggle_password_button.clicked.connect(self.toggle_password_visibility)
+
+        # Layout orizzontale per password e pulsante
+        self.password_layout = QHBoxLayout()
+        self.password_layout.addWidget(self.password)
+        self.password_layout.addWidget(self.toggle_password_button)
+        self.password_layout.setSpacing(10)
+
         # Messaggio di errore
         self.error_message = QLabel("Accesso non riuscito") # Etichetta per il messaggio di errore
         self.error_message.setFixedSize(300, 40) # Dimensioni
@@ -84,17 +110,18 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.login_button.setFixedSize(300, 40) # Dimensioni
         self.login_button.setStyleSheet("""
             QPushButton {
-                background-color: green;
+                background-color: #00796b;
                 color: white;
-                border-radius: 5px;
-                font-size: 18px;
+                border-radius: 10px;
+                font-size: 16px;
                 padding: 10px;
+                border: none;
             }
             QPushButton:hover {
-                background-color: darkgreen;
+                background-color: #004d40;
             }
             QPushButton:pressed {
-                background-color: #005500;
+                background-color: #00251a;
             }
         """) # Stile del bottone
         self.login_button.clicked.connect(self.handle_login) # Funzione del bottone
@@ -109,7 +136,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.layout.addWidget(self.username_label)
         self.layout.addWidget(self.username)
         self.layout.addWidget(self.password_label)
-        self.layout.addWidget(self.password)
+        self.layout.addLayout(self.password_layout)
         self.layout.addWidget(self.login_button)
         self.layout.addWidget(self.error_message)
         self.window = QWidget()
@@ -140,3 +167,11 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         finally:
             if conn.is_connected():
                 conn.close()  # Chiude la connessione al database
+
+    def toggle_password_visibility(self): # Funzione per mostrare/nascondere la password
+        if self.password.echoMode() == QLineEdit.Password:
+            self.password.setEchoMode(QLineEdit.Normal)
+            self.toggle_password_button.setText("🔒")
+        else:
+            self.password.setEchoMode(QLineEdit.Password)
+            self.toggle_password_button.setText("👁")
