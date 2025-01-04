@@ -12,8 +12,9 @@ class NextExamsPage(QMainWindow): # Finestra di visualizzazione degli appelli pr
 
         # Finestra
         self.setWindowTitle("Appelli prenotati")  # Titolo della finestra
-        self.setFixedSize(800, 600)  # Dimensioni della finestra
+        # self.setFixedSize(800, 600)  # Dimensioni della finestra
         self.setStyleSheet("background-color: white; font-family: Helvetica")  # Stile della finestra
+        self.showFullScreen()  # Schermo intero
 
         # Intestazione
         self.header_label = QLabel("Appelli Prenotati")

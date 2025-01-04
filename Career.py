@@ -12,8 +12,9 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
 
         # Finestra
         self.setWindowTitle("Libretto")  # Titolo della finestra
-        self.setFixedSize(800, 600)  # Dimensioni della finestra
+        # self.setFixedSize(800, 600)  # Dimensioni della finestra
         self.setStyleSheet("background-color: white; font-family: Helvetica")  # Stile della finestra
+        self.showFullScreen()  # Schermo intero
 
         # Intestazione
         self.header_label = QLabel("Esami Sostenuti")

@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLabel
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLabel, QFrame
 from mysql.connector import Error
 from datetime import datetime
 
@@ -11,9 +11,10 @@ from DatabaseConnection import connection
 
 
 class HomeWindow(QMainWindow):
-    def __init__(self, matricola: str):
+    def __init__(self, matricola: str, name: str):
         super().__init__()
         self.matricola = matricola # Matricola dello studente loggato
+        self.name = name
 
         self.career_page = None # Pagina di visualizzazione degli esami dati
         self.booking_page = None # Pagina di visualizzazione degli appelli prenotabili
@@ -21,8 +22,19 @@ class HomeWindow(QMainWindow):
 
         # Finestra
         self.setWindowTitle("Home")  # Titolo della finestra
-        self.setFixedSize(800, 600)  # Dimensioni della finestra
+        # self.setFixedSize(800, 600)  # Dimensioni della finestra
         self.setStyleSheet("background-color: white; font-family: Helvetica")  # Stile della finestra
+        self.showFullScreen()  # Schermo intero
+
+        # Intestazione
+        self.header_label = QLabel(f"Benvenuto {self.name}", self)
+        self.header_label.setAlignment(Qt.AlignCenter)
+        self.header_label.setStyleSheet("""
+            font-size: 20px;
+            font-weight: bold;
+            color: #00796b;
+            margin-bottom: 10px;
+        """)
 
         # Logo
         self.logo = QLabel()
@@ -33,17 +45,17 @@ class HomeWindow(QMainWindow):
 
         # Pulsante di prenotazione ad un appello
         self.booking_button = QPushButton("Prenotazione appelli", self)
-        self.booking_button.setFixedSize(300, 40)  # Dimensioni
+        self.booking_button.setFixedSize(350, 50)  # Dimensioni
         self.booking_button.clicked.connect(self.book_exam) # Funzione del bottone
 
         # Pulsante di visualizzazione prossimi esami
         self.view_button = QPushButton("Visualizzazione prossimi esami", self)
-        self.view_button.setFixedSize(300, 40)  # Dimensioni
+        self.view_button.setFixedSize(350, 50)  # Dimensioni
         self.view_button.clicked.connect(self.show_next_exams) # Funzione del bottone
 
         # Pulsante di visualizzazione degli esami dati
         self.career_button = QPushButton("Visualizzazione libretto", self)
-        self.career_button.setFixedSize(300, 40)  # Dimensioni
+        self.career_button.setFixedSize(350, 50)  # Dimensioni
         self.career_button.clicked.connect(self.show_given_exams) # Funzione del bottone
 
         # Stile dei bottoni
@@ -67,16 +79,49 @@ class HomeWindow(QMainWindow):
         self.view_button.setStyleSheet(button_style)
         self.career_button.setStyleSheet(button_style)
 
-        # Layout
+        # Layout del logo
+        self.logo_layout = QVBoxLayout()
+        self.logo_layout.addWidget(self.logo)
+        self.logo_layout.setAlignment(Qt.AlignCenter)  # Allinea il logo al centro
+
+        # Layout per i pulsanti
+        self.choices_frame = QFrame()  # Widget per contenere i pulsanti
+        self.choices_frame.setStyleSheet("""
+            QFrame {
+                border: 3px solid #00796b;
+                border-radius: 15px;
+                background-color: #f0f0f0;
+                padding: 30px;
+                margin-top: 20px;
+                box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
+            }
+            QFrame:hover {
+                background-color: #e0e0e0;
+                box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+            }
+            """)
+        self.choices_layout = QVBoxLayout()
+        self.choices_layout.setAlignment(Qt.AlignCenter)  # Allinea i pulsanti al centro
+        self.choices_layout.setSpacing(25)  # Spaziatura tra i pulsanti
+
+        # Aggiungere i pulsanti al layout
+        self.choices_layout.addWidget(self.booking_button)
+        self.choices_layout.addWidget(self.view_button)
+        self.choices_layout.addWidget(self.career_button)
+        self.choices_frame.setLayout(self.choices_layout)
+
+        # Layout principale
         self.layout = QVBoxLayout()
-        self.layout.setAlignment(Qt.AlignCenter)  # Allineamento al centro di ogni widget
-        self.layout.setSpacing(20)  # Spaziatura tra i widget
+        self.layout.setAlignment(Qt.AlignCenter)  # Allineamento generale al centro di tutti i widget
+        self.layout.setSpacing(30)  # Spaziatura tra i widget
 
         # Aggiunta dei widget al layout
-        self.layout.addWidget(self.logo)
-        self.layout.addWidget(self.booking_button)
-        self.layout.addWidget(self.view_button)
-        self.layout.addWidget(self.career_button)
+        self.layout.insertWidget(0, self.header_label)
+        self.layout.addLayout(self.logo_layout)  # Aggiunge il logo
+        self.layout.addWidget(self.choices_frame)  # Aggiunge il frame con i pulsanti
+        self.layout.addStretch()  # Spazio extra alla fine per centrare gli elementi
+
+        # Impostazione del widget centrale
         self.window = QWidget()
         self.window.setLayout(self.layout)
         self.setCentralWidget(self.window)

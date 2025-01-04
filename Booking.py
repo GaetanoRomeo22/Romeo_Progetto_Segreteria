@@ -12,8 +12,9 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
 
         # Finestra
         self.setWindowTitle("Prenotazione Appelli")  # Titolo della finestra
-        self.setFixedSize(800, 600)  # Dimensioni della finestra
+        # self.setFixedSize(800, 600)  # Dimensioni della finestra
         self.setStyleSheet("background-color: white; font-family: Helvetica")  # Stile della finestra
+        self.showFullScreen()  # Schermo intero
 
         # Intestazione
         self.header_label = QLabel("Appelli Disponibili")

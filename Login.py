@@ -15,8 +15,9 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
 
         # Finestra
         self.setWindowTitle("Login") # Titolo della finestra
-        self.setFixedSize(800, 600) # Dimensioni della finestra
+        # self.setFixedSize(800, 600) # Dimensioni della finestra
         self.setStyleSheet("background-color: white; font-family: Helvetica") # Stile della finestra
+        self.showFullScreen() # Schermo intero
 
         # Logo
         self.logo = QLabel()
@@ -124,7 +125,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
                 background-color: #00251a;
             }
         """) # Stile del bottone
-        self.login_button.clicked.connect(self.handle_login) # Funzione del bottone
+        self.login_button.clicked.connect(self.login) # Funzione del bottone
 
         # Layout
         self.layout = QVBoxLayout()
@@ -143,15 +144,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.window.setLayout(self.layout)
         self.setCentralWidget(self.window)
 
-    def handle_login(self): # Funzione di gestione del login
-        if self.login(): # Se il login va a buon fine
-            self.close()  # Chiude la finestra di login
-            self.home_window = HomeWindow(self.username.text()) # Crea una finestra per la home page
-            self.home_window.show() # Mostra la home page
-        else: # Altrimenti
-            self.error_message.show()  # Messaggio di errore
-
-    def login(self) -> bool: # Funzione di login per lo studente
+    def login(self): # Funzione di login per lo studente
         try:
             conn = connection() # Connessione al database
             cursor = conn.cursor() # Cursore per la query
@@ -159,9 +152,11 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
             cursor.execute(query, (self.username.text(), self.password.text())) # Esegue la query
             result = cursor.fetchone() # Risultati della query
             if result: # Se è stato trovato un utente
-                return True
+                self.close()  # Chiude la finestra di login
+                self.home_window = HomeWindow(self.username.text(), result[2])  # Crea una finestra per la home page
+                self.home_window.show()  # Mostra la home page
             else: # Altrimenti
-                return False
+                self.error_message.show()  # Messaggio di errore
         except Error as e:
             print(f"Errore durante la connessione al database: {e}")
         finally:
