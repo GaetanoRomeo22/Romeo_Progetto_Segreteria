@@ -14,7 +14,7 @@ class HomeWindow(QMainWindow):
     def __init__(self, matricola: str, name: str):
         super().__init__()
         self.matricola = matricola # Matricola dello studente loggato
-        self.name = name
+        self.name = name # Nome dello studente loggato
 
         self.career_page = None # Pagina di visualizzazione degli esami dati
         self.booking_page = None # Pagina di visualizzazione degli appelli prenotabili

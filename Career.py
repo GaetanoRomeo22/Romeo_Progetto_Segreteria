@@ -1,7 +1,7 @@
 from datetime import datetime
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QPushButton, QLabel, \
-    QHeaderView
+    QHeaderView, QAbstractItemView
 
 
 class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto dello studente
@@ -71,14 +71,14 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
                 color: #333333;
             }
         """)
-        self.table.setAlternatingRowColors(True)  # Abilita i colori alternati
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)  # Impedisce la modifica dei dati
-        self.table.setSelectionBehavior(QTableWidget.SelectRows)  # Seleziona intere righe
-        self.table.verticalHeader().setVisible(False)  # Nasconde l'indice delle righe
+        self.table.setAlternatingRowColors(True) # Abilita i colori alternati
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers) # Impedisce la modifica dei dati
+        self.table.setSelectionMode(QAbstractItemView.NoSelection) # Disabilita la selezione
+        self.table.verticalHeader().setVisible(False) # Nasconde l'indice delle righe
 
         # Pulsante per tornare alla home page
         self.back_button = QPushButton("Home Page")
-        self.back_button.setFixedSize(300, 40)  # Dimensioni
+        self.back_button.setFixedSize(300, 40) # Dimensioni
         self.back_button.setStyleSheet("""
             QPushButton {
                 background-color: #00796b;
@@ -95,12 +95,12 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
                 background-color: #00251a;
             }
         """)  # Stile del bottone
-        self.back_button.clicked.connect(self.show_home_page)  # Funzione del bottone
+        self.back_button.clicked.connect(self.show_home_page) # Funzione del bottone
 
         # Layout
         self.layout = QVBoxLayout()
-        self.layout.setAlignment(Qt.AlignCenter)  # Allineamento al centro di ogni widget
-        self.layout.setSpacing(20)  # Spaziatura tra i widget
+        self.layout.setAlignment(Qt.AlignCenter) # Allineamento al centro di ogni widget
+        self.layout.setSpacing(20) # Spaziatura tra i widget
 
         # Aggiunta dei widget al layout
         self.layout.insertWidget(0, self.header_label)
@@ -111,5 +111,5 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
         self.setCentralWidget(self.window)
 
     def show_home_page(self):
-        self.close()  # Chiude la pagina
-        self.home_page.show()  # Mostra la home page
+        self.close() # Chiude la pagina
+        self.home_page.show() # Mostra la home page

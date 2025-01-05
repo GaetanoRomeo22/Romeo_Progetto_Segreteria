@@ -5,6 +5,7 @@ from mysql.connector import Error
 
 from Home import HomeWindow
 from DatabaseConnection import connection
+from Office import OfficePage
 
 
 class LoginWindow(QMainWindow): # Finestra di login personalizzata
@@ -12,6 +13,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         super().__init__()
 
         self.home_window = None # Finestra per la home page
+        self.office_window = None # Finestra per la pagina della segreteria
 
         # Finestra
         self.setWindowTitle("Login") # Titolo della finestra
@@ -145,23 +147,27 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.setCentralWidget(self.window)
 
     def login(self): # Funzione di login per lo studente
-        try:
-            conn = connection() # Connessione al database
-            cursor = conn.cursor() # Cursore per la query
-            query = "SELECT * FROM STUDENTI WHERE MATRICOLA = %s AND PASSWORD = %s" # Query da eseguire
-            cursor.execute(query, (self.username.text(), self.password.text())) # Esegue la query
-            result = cursor.fetchone() # Risultati della query
-            if result: # Se è stato trovato un utente
-                self.close()  # Chiude la finestra di login
-                self.home_window = HomeWindow(self.username.text(), result[2])  # Crea una finestra per la home page
-                self.home_window.show()  # Mostra la home page
-            else: # Altrimenti
-                self.error_message.show()  # Messaggio di errore
-        except Error as e:
-            print(f"Errore durante la connessione al database: {e}")
-        finally:
-            if conn.is_connected():
-                conn.close()  # Chiude la connessione al database
+        if self.username.text() == self.password.text() == "admin": # Se l'utente è della segreteria
+            self.office_window = OfficePage()  # Crea una finestra per la segreteria
+            self.office_window.show()  # Mostra la pagina della segreteria
+        else: # Altrimenti
+            try:
+                conn = connection() # Connessione al database
+                cursor = conn.cursor() # Cursore per la query
+                query = "SELECT * FROM STUDENTI WHERE MATRICOLA = %s AND PASSWORD = %s" # Query da eseguire
+                cursor.execute(query, (self.username.text(), self.password.text())) # Esegue la query
+                result = cursor.fetchone() # Risultati della query
+                if result: # Se è stato trovato un utente
+                    self.close()  # Chiude la finestra di login
+                    self.home_window = HomeWindow(self.username.text(), result[2])  # Crea una finestra per la home page
+                    self.home_window.show()  # Mostra la home page
+                else: # Altrimenti
+                    self.error_message.show()  # Messaggio di errore
+            except Error as e:
+                print(f"Errore durante la connessione al database: {e}")
+            finally:
+                if conn.is_connected():
+                    conn.close()  # Chiude la connessione al database
 
     def toggle_password_visibility(self): # Funzione per mostrare/nascondere la password
         if self.password.echoMode() == QLineEdit.Password:
