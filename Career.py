@@ -20,10 +20,11 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
         self.header_label = QLabel("Esami Sostenuti")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             color: #00796b;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 20px;
         """)
 
         # Tabella
@@ -77,8 +78,9 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
         self.table.verticalHeader().setVisible(False) # Nasconde l'indice delle righe
 
         # Pulsante per tornare alla home page
-        self.back_button = QPushButton("Home Page")
+        self.back_button = QPushButton("Esci")
         self.back_button.setFixedSize(300, 40) # Dimensioni
+        self.back_button.clicked.connect(self.show_home_page)  # Funzione del bottone
         self.back_button.setStyleSheet("""
             QPushButton {
                 background-color: #00796b;
@@ -86,7 +88,6 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
                 border-radius: 10px;
                 font-size: 16px;
                 padding: 10px;
-                border: none;
             }
             QPushButton:hover {
                 background-color: #004d40;
@@ -95,7 +96,6 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
                 background-color: #00251a;
             }
         """)  # Stile del bottone
-        self.back_button.clicked.connect(self.show_home_page) # Funzione del bottone
 
         # Layout
         self.layout = QVBoxLayout()

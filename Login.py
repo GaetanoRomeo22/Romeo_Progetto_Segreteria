@@ -21,6 +21,16 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.setStyleSheet("background-color: white; font-family: Helvetica") # Stile della finestra
         self.showFullScreen() # Schermo intero
 
+        # Intestazione
+        self.header_label = QLabel("Esegui l'accesso")
+        self.header_label.setAlignment(Qt.AlignCenter)
+        self.header_label.setStyleSheet("""
+            font-size: 24px;
+            font-weight: bold;
+            color: #00796b;
+            margin-bottom: 20px;
+        """)
+
         # Logo
         self.logo = QLabel()
         self.logo.setAlignment(Qt.AlignCenter) # Allineamento al centro
@@ -118,7 +128,6 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
                 border-radius: 10px;
                 font-size: 16px;
                 padding: 10px;
-                border: none;
             }
             QPushButton:hover {
                 background-color: #004d40;
@@ -135,6 +144,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.layout.setSpacing(20) # Spaziatura tra i widget
 
         # Aggiunta dei widget al layout
+        # self.layout.insertWidget(0, self.header_label)
         self.layout.addWidget(self.logo)
         self.layout.addWidget(self.username_label)
         self.layout.addWidget(self.username)

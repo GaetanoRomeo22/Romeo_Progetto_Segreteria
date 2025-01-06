@@ -2,10 +2,17 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton, QVBoxLayout, QFrame, QWidget
 
+from AddExam import AddExamPage
+from ValidateExam import ValidateExamPage
+
 
 class OfficePage(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.login_page = None # Pagina di login
+        self.add_exam_page = None # Pagina di inserimento di un appello
+        self.validate_exam_page = None # Pagina di convalida degli esami
 
         # Finestra
         self.setWindowTitle("Segreteria")  # Titolo della finestra
@@ -17,10 +24,11 @@ class OfficePage(QMainWindow):
         self.header_label = QLabel("Segreteria")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             color: #00796b;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 20px;
         """)
 
         # Logo
@@ -31,14 +39,14 @@ class OfficePage(QMainWindow):
         self.logo.setPixmap(self.pixmap)
 
         # Pulsante di inserimento di un appello
-        self.adding_button = QPushButton("Inserimento Appelli", self)
+        self.adding_button = QPushButton("Inserimento Appelli")
         self.adding_button.setFixedSize(350, 50)  # Dimensioni
-        # self.adding_button.clicked.connect()  # Funzione del bottone
+        self.adding_button.clicked.connect(self.show_add_exam_page)  # Funzione del bottone
 
         # Pulsante di convalida degli esami
-        self.validate_button = QPushButton("Convalida Esami", self)
+        self.validate_button = QPushButton("Convalida Esami")
         self.validate_button.setFixedSize(350, 50)  # Dimensioni
-        # self.validate_button.clicked.connect()  # Funzione del bottone
+        self.validate_button.clicked.connect(self.show_validate_exam_page)  # Funzione del bottone
 
         # Stile dei bottoni
         button_style = """
@@ -48,7 +56,6 @@ class OfficePage(QMainWindow):
                 border-radius: 10px;
                 font-size: 16px;
                 padding: 10px;
-                border: none;
             }
             QPushButton:hover {
                 background-color: #004d40;
@@ -59,6 +66,29 @@ class OfficePage(QMainWindow):
         """
         self.adding_button.setStyleSheet(button_style)
         self.validate_button.setStyleSheet(button_style)
+
+        # Pulsante di logout
+        self.logout_button = QPushButton("Logout")
+        self.logout_button.setFixedSize(350, 50)  # Dimensioni
+        self.logout_button.clicked.connect(self.logout)  # Funzione del bottone
+        self.logout_button.setStyleSheet("""
+            QPushButton {
+                background-color: #d32f2f;
+                color: white;
+                border: 2px solid #b71c1c;
+                border-radius: 10px;
+                font-size: 16px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #b71c1c;
+                border: 2px solid #d32f2f;
+            }
+            QPushButton:pressed {
+                background-color: #ff6659;
+                border: 2px solid #b71c1c;
+            }
+        """)
 
         # Layout del logo
         self.logo_layout = QVBoxLayout()
@@ -74,11 +104,6 @@ class OfficePage(QMainWindow):
                 background-color: #f0f0f0;
                 padding: 30px;
                 margin-top: 20px;
-                box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
-            }
-            QFrame:hover {
-                background-color: #e0e0e0;
-                box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
             }
         """)
         self.choices_layout = QVBoxLayout()
@@ -88,6 +113,7 @@ class OfficePage(QMainWindow):
         # Aggiungere i pulsanti al layout
         self.choices_layout.addWidget(self.adding_button)
         self.choices_layout.addWidget(self.validate_button)
+        self.choices_layout.addWidget(self.logout_button)
         self.choices_frame.setLayout(self.choices_layout)
 
         # Layout principale
@@ -105,3 +131,19 @@ class OfficePage(QMainWindow):
         self.window = QWidget()
         self.window.setLayout(self.layout)
         self.setCentralWidget(self.window)
+
+    def show_add_exam_page(self):
+        self.close() # Chiude la pagina corrente
+        self.add_exam_page = AddExamPage() # Crea una pagina per la creazione di un appello
+        self.add_exam_page.show() # Mostra la pagina
+
+    def show_validate_exam_page(self):
+        self.close() # Chiude la pagina corrente
+        self.validate_exam_page = ValidateExamPage() # Crea una pagina di validazione di un esame
+        self.validate_exam_page.show() # Mostra la pagina
+
+    def logout(self): # Funzione di logout per l'utente
+        from Login import LoginWindow
+        self.close() # Chiude la home page
+        self.login_page = LoginWindow() # Crea una finestra di login
+        self.login_page.show() # Mostra la finestra di login

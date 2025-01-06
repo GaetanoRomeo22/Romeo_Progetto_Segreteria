@@ -16,6 +16,7 @@ class HomeWindow(QMainWindow):
         self.matricola = matricola # Matricola dello studente loggato
         self.name = name # Nome dello studente loggato
 
+        self.login_page = None # Pagina di login
         self.career_page = None # Pagina di visualizzazione degli esami dati
         self.booking_page = None # Pagina di visualizzazione degli appelli prenotabili
         self.next_exams_page = None # Pagina di visualizzazione degli appelli prenotati
@@ -27,13 +28,14 @@ class HomeWindow(QMainWindow):
         self.showFullScreen()  # Schermo intero
 
         # Intestazione
-        self.header_label = QLabel(f"Benvenuto {self.name}", self)
+        self.header_label = QLabel(f"Benvenuto {self.name}")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             color: #00796b;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            margin-top: 20px;
         """)
 
         # Logo
@@ -44,17 +46,17 @@ class HomeWindow(QMainWindow):
         self.logo.setPixmap(self.pixmap)
 
         # Pulsante di prenotazione ad un appello
-        self.booking_button = QPushButton("Prenotazione appelli", self)
+        self.booking_button = QPushButton("Prenotazione appelli")
         self.booking_button.setFixedSize(350, 50)  # Dimensioni
         self.booking_button.clicked.connect(self.book_exam) # Funzione del bottone
 
         # Pulsante di visualizzazione prossimi esami
-        self.view_button = QPushButton("Visualizzazione prossimi esami", self)
+        self.view_button = QPushButton("Visualizzazione prossimi esami")
         self.view_button.setFixedSize(350, 50)  # Dimensioni
         self.view_button.clicked.connect(self.show_next_exams) # Funzione del bottone
 
         # Pulsante di visualizzazione degli esami dati
-        self.career_button = QPushButton("Visualizzazione libretto", self)
+        self.career_button = QPushButton("Visualizzazione libretto")
         self.career_button.setFixedSize(350, 50)  # Dimensioni
         self.career_button.clicked.connect(self.show_given_exams) # Funzione del bottone
 
@@ -66,7 +68,6 @@ class HomeWindow(QMainWindow):
                 border-radius: 10px;
                 font-size: 16px;
                 padding: 10px;
-                border: none;
             }
             QPushButton:hover {
                 background-color: #004d40;
@@ -78,6 +79,29 @@ class HomeWindow(QMainWindow):
         self.booking_button.setStyleSheet(button_style)
         self.view_button.setStyleSheet(button_style)
         self.career_button.setStyleSheet(button_style)
+
+        # Pulsante di logout
+        self.logout_button = QPushButton("Logout")
+        self.logout_button.setFixedSize(350, 50) # Dimensioni
+        self.logout_button.clicked.connect(self.logout) # Funzione del bottone
+        self.logout_button.setStyleSheet("""
+            QPushButton {
+                background-color: #d32f2f;
+                color: white;
+                border: 2px solid #b71c1c;
+                border-radius: 10px;
+                font-size: 16px;
+                padding: 10px;
+            }
+            QPushButton:hover {
+                background-color: #b71c1c;
+                border: 2px solid #d32f2f;
+            }
+            QPushButton:pressed {
+                background-color: #ff6659;
+                border: 2px solid #b71c1c;
+            }
+        """)
 
         # Layout del logo
         self.logo_layout = QVBoxLayout()
@@ -91,13 +115,8 @@ class HomeWindow(QMainWindow):
                 border: 3px solid #00796b;
                 border-radius: 15px;
                 background-color: #f0f0f0;
-                padding: 30px;
+                padding: 20px;
                 margin-top: 20px;
-                box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.1);
-            }
-            QFrame:hover {
-                background-color: #e0e0e0;
-                box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
             }
             """)
         self.choices_layout = QVBoxLayout()
@@ -108,6 +127,7 @@ class HomeWindow(QMainWindow):
         self.choices_layout.addWidget(self.booking_button)
         self.choices_layout.addWidget(self.view_button)
         self.choices_layout.addWidget(self.career_button)
+        self.choices_layout.addWidget(self.logout_button)
         self.choices_frame.setLayout(self.choices_layout)
 
         # Layout principale
@@ -181,3 +201,9 @@ class HomeWindow(QMainWindow):
         finally:
             if conn.is_connected():
                 conn.close()  # Chiude la connessione al database
+
+    def logout(self): # Funzione di logout per l'utente
+        from Login import LoginWindow
+        self.close() # Chiude la home page
+        self.login_page = LoginWindow() # Crea una finestra di login
+        self.login_page.show() # Mostra la finestra di login
