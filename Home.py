@@ -31,7 +31,7 @@ class HomeWindow(QMainWindow):
         self.header_label = QLabel(f"Benvenuto {self.name}")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: #00796b;
             margin-bottom: 20px;
@@ -95,11 +95,9 @@ class HomeWindow(QMainWindow):
             }
             QPushButton:hover {
                 background-color: #b71c1c;
-                border: 2px solid #d32f2f;
             }
             QPushButton:pressed {
                 background-color: #ff6659;
-                border: 2px solid #b71c1c;
             }
         """)
 
@@ -153,8 +151,8 @@ class HomeWindow(QMainWindow):
             query = "SELECT CORSOSTUDENTE FROM STUDENTI WHERE MATRICOLA = %s" # Query per estrapolare il corso dello studente
             cursor.execute(query, (self.matricola, )) # Esegue la query
             student_course = cursor.fetchone() # Salva il risultato
-            query = ("SELECT NOMEESAME, CORSOESAME, DATAESAME FROM APPELLI"
-                     " WHERE CORSOESAME = %s AND DATAESAME > %s") # Query per estrapolare gli appelli prenotabili
+            query = ("SELECT NOMEESAME, NOMECORSO, DATAESAME FROM APPELLI"
+                     " WHERE NOMECORSO = %s AND DATAESAME > %s") # Query per estrapolare gli appelli prenotabili
             current_date = datetime.now().date() # Data corrente
             cursor.execute(query, (student_course[0], current_date)) # Esegue la query
             available_exams = cursor.fetchall() # Risultati della query
@@ -165,14 +163,15 @@ class HomeWindow(QMainWindow):
             print(f"Errore durante la connessione al database: {e}")
         finally:
             if conn.is_connected():
+                cursor.close()  # Chiude il cursore
                 conn.close()  # Chiude la connessione al database
 
     def show_next_exams(self): # Funzione di visualizzazione degli appelli prenotati dallo studente
         try:
             conn = connection()  # Connessione al database
             cursor = conn.cursor()  # Cursore per la query
-            query = ("SELECT A.NOMEESAME, A.CORSOESAME, A.DATAESAME FROM APPELLI A JOIN PRENOTA P ON A.NOMEESAME = P.NOMEESAME"
-                     " AND A.CORSOESAME = P.CORSOESAME WHERE P.MATRICOLA = %s AND A.DATAESAME > %s")  # Query da eseguire
+            query = ("SELECT A.NOMEESAME, A.NOMECORSO, A.DATAESAME FROM APPELLI A JOIN PRENOTA P ON A.NOMEESAME = P.NOMEESAME"
+                     " AND A.NOMECORSO = P.NOMECORSO WHERE P.MATRICOLA = %s AND A.DATAESAME > %s")  # Query da eseguire
             current_date = datetime.now().date()  # Data corrente
             cursor.execute(query, (self.matricola, current_date))  # Esegue la query
             next_exams = cursor.fetchall()  # Risultati della query
@@ -183,14 +182,15 @@ class HomeWindow(QMainWindow):
             print(f"Errore durante la connessione al database: {e}")
         finally:
             if conn.is_connected():
+                cursor.close()  # Chiude il cursore
                 conn.close()  # Chiude la connessione al database
 
     def show_given_exams(self): # Funzione di visualizzazione degli esami dati dallo studente
         try:
             conn = connection() # Connessione al database
             cursor = conn.cursor()  # Cursore per la query
-            query = ("SELECT A.NOMEESAME, A.CORSOESAME, SP.VOTO, A.DATAESAME FROM SUPERA SP "
-                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.CORSOESAME = A.CORSOESAME WHERE SP.MATRICOLA = %s")  # Query da eseguire
+            query = ("SELECT A.NOMEESAME, A.NOMECORSO, SP.VOTO, A.DATAESAME FROM SUPERA SP "
+                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.NOMECORSO = A.NOMECORSO WHERE SP.MATRICOLA = %s")  # Query da eseguire
             cursor.execute(query, (self.matricola, )) # Esegue la query
             given_exams = cursor.fetchall()  # Risultati della query
             self.close() # Chiude la home page
@@ -200,6 +200,7 @@ class HomeWindow(QMainWindow):
             print(f"Errore durante la connessione al database: {e}")
         finally:
             if conn.is_connected():
+                cursor.close()  # Chiude il cursore
                 conn.close()  # Chiude la connessione al database
 
     def logout(self): # Funzione di logout per l'utente

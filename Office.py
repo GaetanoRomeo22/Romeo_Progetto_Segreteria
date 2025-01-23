@@ -24,7 +24,7 @@ class OfficePage(QMainWindow):
         self.header_label = QLabel("Segreteria")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: #00796b;
             margin-bottom: 20px;
@@ -134,12 +134,12 @@ class OfficePage(QMainWindow):
 
     def show_add_exam_page(self):
         self.close() # Chiude la pagina corrente
-        self.add_exam_page = AddExamPage() # Crea una pagina per la creazione di un appello
+        self.add_exam_page = AddExamPage(self) # Crea una pagina per la creazione di un appello
         self.add_exam_page.show() # Mostra la pagina
 
     def show_validate_exam_page(self):
         self.close() # Chiude la pagina corrente
-        self.validate_exam_page = ValidateExamPage() # Crea una pagina di validazione di un esame
+        self.validate_exam_page = ValidateExamPage(self) # Crea una pagina di validazione di un esame
         self.validate_exam_page.show() # Mostra la pagina
 
     def logout(self): # Funzione di logout per l'utente

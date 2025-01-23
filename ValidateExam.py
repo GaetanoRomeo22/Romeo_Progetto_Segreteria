@@ -1,12 +1,14 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton
 
+from DatabaseConnection import connection
+
 
 class ValidateExamPage(QMainWindow):
-    def __init__(self):
+    def __init__(self, office_page):
         super().__init__()
 
-        self.office_window = None  # Finestra per la pagina della segreteria
+        self.office_window = office_page  # Finestra per la pagina della segreteria
 
         # Finestra
         self.setWindowTitle("Validazione Esame")  # Titolo della finestra
@@ -15,10 +17,10 @@ class ValidateExamPage(QMainWindow):
         self.showFullScreen()  # Schermo intero
 
         # Intestazione
-        self.header_label = QLabel("Valida un esame")
+        self.header_label = QLabel("Convalida esami")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: #00796b;
             margin-bottom: 20px;
@@ -26,22 +28,22 @@ class ValidateExamPage(QMainWindow):
         """)
 
         # Pulsante per tornare alla home page
-        self.back_button = QPushButton("Segreteria")
+        self.back_button = QPushButton("Esci")
         self.back_button.setFixedSize(300, 40)  # Dimensioni
         self.back_button.clicked.connect(self.show_office_window)  # Funzione del bottone
         self.back_button.setStyleSheet("""
             QPushButton {
-                background-color: #00796b;
+                background-color: #d32f2f;
                 color: white;
                 border-radius: 10px;
-                font-size: 16px;
+                font-size: 18px;
                 padding: 10px;
             }
             QPushButton:hover {
-                background-color: #004d40;
+                background-color: #b71c1c;
             }
             QPushButton:pressed {
-                background-color: #00251a;
+                background-color: #ff6659;
             }
         """)  # Stile del bottone
 

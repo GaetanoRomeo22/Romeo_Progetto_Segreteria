@@ -25,7 +25,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.header_label = QLabel("Esegui l'accesso")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: #00796b;
             margin-bottom: 20px;
@@ -40,7 +40,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
 
         # Username
         self.username_label = QLabel("Matricola") # Etichetta per l'username
-        self.username_label.setStyleSheet("color: black; font-size: 16px") # Stile della casella di username
+        self.username_label.setStyleSheet("color: #333; font-size: 18px; font-weight: bold;") # Stile della casella di username
         # self.username_label.setAlignment(Qt.AlignCenter) # Allineamento al centro
         self.username = QLineEdit() # Casella di testo per l'username
         self.username.setPlaceholderText("Inserisci la tua matricola") # Placeholder
@@ -63,7 +63,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
 
         # Password
         self.password_label = QLabel("Password") # Etichetta per la password
-        self.password_label.setStyleSheet("color: black; font-size: 16px")  # Stile della casella di password
+        self.password_label.setStyleSheet("color: #333; font-size: 18px; font-weight: bold;")  # Stile della casella di password
         # self.password_label.setAlignment(Qt.AlignCenter) # Allineamento al centro
         self.password = QLineEdit()  # Casella di testo per la password
         self.password.setPlaceholderText("Inserisci la tua password")  # Placeholder
@@ -177,6 +177,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
                 print(f"Errore durante la connessione al database: {e}")
             finally:
                 if conn.is_connected():
+                    cursor.close()  # Chiude il cursore
                     conn.close()  # Chiude la connessione al database
 
     def toggle_password_visibility(self): # Funzione per mostrare/nascondere la password

@@ -20,7 +20,7 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
         self.header_label = QLabel("Appelli Disponibili")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
             color: #00796b;
             margin-bottom: 20px;
@@ -83,17 +83,20 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
         self.back_button.clicked.connect(self.show_home_page)  # Funzione del bottone
         self.back_button.setStyleSheet("""
             QPushButton {
-                background-color: #00796b;
+                background-color: #d32f2f;
                 color: white;
+                border: 2px solid #b71c1c;
                 border-radius: 10px;
                 font-size: 16px;
                 padding: 10px;
             }
             QPushButton:hover {
-                background-color: #004d40;
+                background-color: #b71c1c;
+                border: 2px solid #d32f2f;
             }
             QPushButton:pressed {
-                background-color: #00251a;
+                background-color: #ff6659;
+                border: 2px solid #b71c1c;
             }
         """)  # Stile del bottone
 
