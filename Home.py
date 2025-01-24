@@ -151,13 +151,16 @@ class HomeWindow(QMainWindow):
             query = "SELECT CORSOSTUDENTE FROM STUDENTI WHERE MATRICOLA = %s" # Query per estrapolare il corso dello studente
             cursor.execute(query, (self.matricola, )) # Esegue la query
             student_course = cursor.fetchone() # Salva il risultato
-            query = ("SELECT NOMEESAME, NOMECORSO, DATAESAME FROM APPELLI"
-                     " WHERE NOMECORSO = %s AND DATAESAME > %s") # Query per estrapolare gli appelli prenotabili
-            current_date = datetime.now().date() # Data corrente
-            cursor.execute(query, (student_course[0], current_date)) # Esegue la query
-            available_exams = cursor.fetchall() # Risultati della query
+            query = ("""
+                SELECT A.NOMEESAME, A.NOMECORSO, A.DATAESAME FROM APPELLI A WHERE A.NOMECORSO = %s AND A.DATAESAME > %s
+                  AND A.NOMEESAME NOT IN (
+                      SELECT P.NOMEESAME FROM PRENOTA P WHERE P.MATRICOLA = %s AND P.NOMECORSO = A.NOMECORSO)
+            """) # Query per estrapolare gli appelli prenotabili
+            current_date = datetime.now().date()  # Data corrente
+            cursor.execute(query, (student_course[0], current_date, self.matricola))  # Esegue la query
+            available_exams = cursor.fetchall()  # Risultati della query
             self.close()  # Chiude la home page
-            self.booking_page = BookingPage(available_exams, self)  # Crea una finestra per visualizzare gli esami superati
+            self.booking_page = BookingPage(available_exams, self)  # Crea una finestra per visualizzare gli esami disponibili
             self.booking_page.show()  # Mostra gli appelli prenotabili
         except Error as e:
             print(f"Errore durante la connessione al database: {e}")
@@ -190,7 +193,8 @@ class HomeWindow(QMainWindow):
             conn = connection() # Connessione al database
             cursor = conn.cursor()  # Cursore per la query
             query = ("SELECT A.NOMEESAME, A.NOMECORSO, SP.VOTO, A.DATAESAME FROM SUPERA SP "
-                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.NOMECORSO = A.NOMECORSO WHERE SP.MATRICOLA = %s")  # Query da eseguire
+                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.NOMECORSO = A.NOMECORSO"
+                     " AND A.DATAESAME <= CURRENT_DATE WHERE SP.MATRICOLA = %s")  # Query da eseguire
             cursor.execute(query, (self.matricola, )) # Esegue la query
             given_exams = cursor.fetchall()  # Risultati della query
             self.close() # Chiude la home page
