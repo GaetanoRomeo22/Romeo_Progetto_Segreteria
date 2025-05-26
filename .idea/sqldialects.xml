@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/AddExam.py" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Booking.py" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Career.py" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/DatabaseCreationScript.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Home.py" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/Login.py" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/NextExams.py" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/ValidateExam.py" dialect="MySQL" />
+  </component>
+</project>

@@ -2,13 +2,18 @@ from datetime import datetime
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QTableWidget, QTableWidgetItem, QPushButton, QLabel, \
     QHeaderView, QAbstractItemView
+from mysql.connector import Error
+
+from DatabaseConnection import connection
 
 
 class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto dello studente
-    def __init__(self, given_exams, home_page):
+    def __init__(self, matricola: str, home_page):
         super().__init__()
 
         self.home_page = home_page  # Finestra home page
+        self.matricola = matricola
+        self.given_exams = None
 
         # Finestra
         self.setWindowTitle("Libretto")  # Titolo della finestra
@@ -27,18 +32,20 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
             margin-top: 20px;
         """)
 
+        self.show_given_exams() # Mostra gli esami superati
+
         # Tabella
         self.table = QTableWidget()
         self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["Nome Esame", "Corso", "Voto", "Data Appello"])
-        self.table.setRowCount(len(given_exams))
+        self.table.setHorizontalHeaderLabels(["Esame", "Corso", "Voto", "Data"])
+        self.table.setRowCount(len(self.given_exams))
 
         # Ridimensionamento uniforme delle colonne
         header = self.table.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
 
         # Popolamento della tabella
-        for row_index, exam in enumerate(given_exams):
+        for row_index, exam in enumerate(self.given_exams):
             for col_index, value in enumerate(exam):
                 if col_index == 3:
                     value = datetime.strptime(value, "%Y-%m-%d").strftime("%d-%m-%Y") if isinstance(value,
@@ -116,3 +123,19 @@ class CareerPage(QMainWindow): # Finestra per la visualizzazione del libretto de
     def show_home_page(self):
         self.close() # Chiude la pagina
         self.home_page.show() # Mostra la home page
+
+    def show_given_exams(self): # Funzione di visualizzazione degli esami dati dallo studente
+        try:
+            conn = connection() # Connessione al database
+            cursor = conn.cursor()  # Cursore per la query
+            query = ("SELECT A.NOMEESAME, A.NOMECORSO, SP.VOTO, A.DATAESAME FROM SUPERA SP "
+                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.NOMECORSO = A.NOMECORSO"
+                     " AND A.DATAESAME <= CURRENT_DATE WHERE SP.MATRICOLA = %s")  # Query da eseguire
+            cursor.execute(query, (self.matricola, )) # Esegue la query
+            self.given_exams = cursor.fetchall()  # Risultati della query
+        except Error as e:
+            print(f"Errore durante la connessione al database: {e}")
+        finally:
+            if conn.is_connected():
+                cursor.close()  # Chiude il cursore
+                conn.close()  # Chiude la connessione al database

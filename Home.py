@@ -1,13 +1,10 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QLabel, QFrame
-from mysql.connector import Error
-from datetime import datetime
 
 from Career import CareerPage
 from Booking import BookingPage
 from NextExams import NextExamsPage
-from DatabaseConnection import connection
 
 
 class HomeWindow(QMainWindow):
@@ -35,30 +32,34 @@ class HomeWindow(QMainWindow):
             font-weight: bold;
             color: #00796b;
             margin-bottom: 20px;
-            margin-top: 20px;
+            margin-top: 40px;
         """)
 
         # Logo
         self.logo = QLabel()
         self.logo.setAlignment(Qt.AlignCenter)  # Allineamento al centro
-        self.pixmap = QPixmap("uniparthenope.png")  # Immagine logo
-        self.pixmap = self.pixmap.scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Ridimensiona l'immagine
+        self.pixmap = QPixmap("logo.png")  # Immagine logo
+        self.pixmap = self.pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Ridimensiona l'immagine
         self.logo.setPixmap(self.pixmap)
+        self.logo.setStyleSheet("""
+            margin-bottom: 20px;
+            margin-top: 20px;
+        """)
 
         # Pulsante di prenotazione ad un appello
-        self.booking_button = QPushButton("Prenotazione appelli")
+        self.booking_button = QPushButton("Appelli disponibili")
         self.booking_button.setFixedSize(350, 50)  # Dimensioni
-        self.booking_button.clicked.connect(self.book_exam) # Funzione del bottone
+        self.booking_button.clicked.connect(self.show_booking_page) # Funzione del bottone
 
         # Pulsante di visualizzazione prossimi esami
-        self.view_button = QPushButton("Visualizzazione prossimi esami")
+        self.view_button = QPushButton("Appelli prenotati")
         self.view_button.setFixedSize(350, 50)  # Dimensioni
-        self.view_button.clicked.connect(self.show_next_exams) # Funzione del bottone
+        self.view_button.clicked.connect(self.show_next_exams_page) # Funzione del bottone
 
         # Pulsante di visualizzazione degli esami dati
-        self.career_button = QPushButton("Visualizzazione libretto")
+        self.career_button = QPushButton("Libretto")
         self.career_button.setFixedSize(350, 50)  # Dimensioni
-        self.career_button.clicked.connect(self.show_given_exams) # Funzione del bottone
+        self.career_button.clicked.connect(self.show_given_exams_page) # Funzione del bottone
 
         # Stile dei bottoni
         button_style = """
@@ -114,7 +115,7 @@ class HomeWindow(QMainWindow):
                 border-radius: 15px;
                 background-color: #f0f0f0;
                 padding: 20px;
-                margin-top: 20px;
+                margin-top: 50px;
             }
             """)
         self.choices_layout = QVBoxLayout()
@@ -144,68 +145,20 @@ class HomeWindow(QMainWindow):
         self.window.setLayout(self.layout)
         self.setCentralWidget(self.window)
 
-    def book_exam(self): # Funzione di prenotazione di un appello per lo studente
-        try:
-            conn = connection()  # Connessione al database
-            cursor = conn.cursor()  # Cursore per la query
-            query = "SELECT CORSOSTUDENTE FROM STUDENTI WHERE MATRICOLA = %s" # Query per estrapolare il corso dello studente
-            cursor.execute(query, (self.matricola, )) # Esegue la query
-            student_course = cursor.fetchone() # Salva il risultato
-            query = ("""
-                SELECT A.NOMEESAME, A.NOMECORSO, A.DATAESAME FROM APPELLI A WHERE A.NOMECORSO = %s AND A.DATAESAME > %s
-                  AND A.NOMEESAME NOT IN (
-                      SELECT P.NOMEESAME FROM PRENOTA P WHERE P.MATRICOLA = %s AND P.NOMECORSO = A.NOMECORSO)
-            """) # Query per estrapolare gli appelli prenotabili
-            current_date = datetime.now().date()  # Data corrente
-            cursor.execute(query, (student_course[0], current_date, self.matricola))  # Esegue la query
-            available_exams = cursor.fetchall()  # Risultati della query
-            self.close()  # Chiude la home page
-            self.booking_page = BookingPage(available_exams, self)  # Crea una finestra per visualizzare gli esami disponibili
-            self.booking_page.show()  # Mostra gli appelli prenotabili
-        except Error as e:
-            print(f"Errore durante la connessione al database: {e}")
-        finally:
-            if conn.is_connected():
-                cursor.close()  # Chiude il cursore
-                conn.close()  # Chiude la connessione al database
+    def show_booking_page(self): # Funzione di visualizzazione della pagina di prenotazione di un appello
+        self.close() # Chiude la home page
+        self.booking_page = BookingPage(self.matricola, self) # Crea una finestra per la prenotazione di un appello
+        self.booking_page.show() # Mostra gli appelli prenotabili
 
-    def show_next_exams(self): # Funzione di visualizzazione degli appelli prenotati dallo studente
-        try:
-            conn = connection()  # Connessione al database
-            cursor = conn.cursor()  # Cursore per la query
-            query = ("SELECT A.NOMEESAME, A.NOMECORSO, A.DATAESAME FROM APPELLI A JOIN PRENOTA P ON A.NOMEESAME = P.NOMEESAME"
-                     " AND A.NOMECORSO = P.NOMECORSO WHERE P.MATRICOLA = %s AND A.DATAESAME > %s")  # Query da eseguire
-            current_date = datetime.now().date()  # Data corrente
-            cursor.execute(query, (self.matricola, current_date))  # Esegue la query
-            next_exams = cursor.fetchall()  # Risultati della query
-            self.close()  # Chiude la home page
-            self.next_exams_page = NextExamsPage(next_exams, self)  # Crea una finestra per visualizzare gli esami superati
-            self.next_exams_page.show()  # Mostra gli appelli prenotati
-        except Error as e:
-            print(f"Errore durante la connessione al database: {e}")
-        finally:
-            if conn.is_connected():
-                cursor.close()  # Chiude il cursore
-                conn.close()  # Chiude la connessione al database
+    def show_next_exams_page(self): # Funzione di visualizzazione della pagina degli appelli prenotati
+        self.close()  # Chiude la home page
+        self.next_exams_page = NextExamsPage(self.matricola, self)  # Crea una finestra per visualizzare gli appelli prenotati
+        self.next_exams_page.show()  # Mostra gli appelli prenotati
 
-    def show_given_exams(self): # Funzione di visualizzazione degli esami dati dallo studente
-        try:
-            conn = connection() # Connessione al database
-            cursor = conn.cursor()  # Cursore per la query
-            query = ("SELECT A.NOMEESAME, A.NOMECORSO, SP.VOTO, A.DATAESAME FROM SUPERA SP "
-                     " JOIN APPELLI A ON SP.NOMEESAME = A.NOMEESAME AND SP.NOMECORSO = A.NOMECORSO"
-                     " AND A.DATAESAME <= CURRENT_DATE WHERE SP.MATRICOLA = %s")  # Query da eseguire
-            cursor.execute(query, (self.matricola, )) # Esegue la query
-            given_exams = cursor.fetchall()  # Risultati della query
-            self.close() # Chiude la home page
-            self.career_page = CareerPage(given_exams, self) # Crea una finestra per visualizzare gli esami superati
-            self.career_page.show() # Mostra gli esami superati
-        except Error as e:
-            print(f"Errore durante la connessione al database: {e}")
-        finally:
-            if conn.is_connected():
-                cursor.close()  # Chiude il cursore
-                conn.close()  # Chiude la connessione al database
+    def show_given_exams_page(self): # Funzione di visualizzazione degli esami dati dallo studente
+        self.close()  # Chiude la home page
+        self.career_page = CareerPage(self.matricola, self)  # Crea una finestra per visualizzare gli esami superati
+        self.career_page.show()  # Mostra gli esami superati
 
     def logout(self): # Funzione di logout per l'utente
         from Login import LoginWindow

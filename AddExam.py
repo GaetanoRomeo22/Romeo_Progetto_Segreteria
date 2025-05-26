@@ -1,6 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QLineEdit, QHBoxLayout, QDateEdit, \
-    QComboBox
+from PyQt5.QtWidgets import QMainWindow, QLabel, QVBoxLayout, QWidget, QPushButton, QDateEdit, QComboBox
 from mysql.connector import Error
 
 from DatabaseConnection import connection
@@ -30,7 +29,7 @@ class AddExamPage(QMainWindow):
         """)
 
         # Nome dell'esame
-        self.exam_name_label = QLabel("Nome Esame")  # Etichetta per il nome dell'esame
+        self.exam_name_label = QLabel("Nome esame")  # Etichetta per il nome dell'esame
         self.exam_name_label.setStyleSheet("color: #333; font-size: 18px; font-weight: bold;")
         self.exam_name = QComboBox()  # Menu a tendina per i nomi degli esami
         self.exam_name.setFixedSize(300, 40)  # Dimensioni del menu
@@ -50,7 +49,7 @@ class AddExamPage(QMainWindow):
         """)
 
         # Nome dell'esame
-        self.exam_course_label = QLabel("Nome Corso")  # Etichetta per il nome dell'esame
+        self.exam_course_label = QLabel("Nome corso")  # Etichetta per il nome dell'esame
         self.exam_course_label.setStyleSheet("color: #333; font-size: 18px; font-weight: bold;")
         self.exam_course = QComboBox()  # Menu a tendina per i nomi degli esami
         self.exam_course.setFixedSize(300, 40)  # Dimensioni del menu
@@ -70,7 +69,7 @@ class AddExamPage(QMainWindow):
         """)
 
         # Data dell'appello
-        self.exam_date_label = QLabel("Data dell'Appello")
+        self.exam_date_label = QLabel("Data appello")
         self.exam_date_label.setStyleSheet("color: #333; font-size: 18px; font-weight: bold;")
         self.exam_date = QDateEdit()
         self.exam_date.setDisplayFormat("dd/MM/yyyy")

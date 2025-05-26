@@ -22,7 +22,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.showFullScreen() # Schermo intero
 
         # Intestazione
-        self.header_label = QLabel("Esegui l'accesso")
+        self.header_label = QLabel("Login")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
             font-size: 28px;
@@ -34,9 +34,13 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         # Logo
         self.logo = QLabel()
         self.logo.setAlignment(Qt.AlignCenter) # Allineamento al centro
-        self.pixmap = QPixmap("uniparthenope.png") # Immagine logo
-        self.pixmap = self.pixmap.scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation) # Ridimensiona l'immagine
+        self.pixmap = QPixmap("logo.png") # Immagine logo
+        self.pixmap = self.pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation) # Ridimensiona l'immagine
         self.logo.setPixmap(self.pixmap)
+        self.logo.setStyleSheet("""
+            margin-bottom: 20px;
+            margin-top: 20px;
+        """)
 
         # Username
         self.username_label = QLabel("Matricola") # Etichetta per l'username
@@ -144,7 +148,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.layout.setSpacing(20) # Spaziatura tra i widget
 
         # Aggiunta dei widget al layout
-        # self.layout.insertWidget(0, self.header_label)
+        self.layout.insertWidget(0, self.header_label)
         self.layout.addWidget(self.logo)
         self.layout.addWidget(self.username_label)
         self.layout.addWidget(self.username)
@@ -169,7 +173,7 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
                 result = cursor.fetchone() # Risultati della query
                 if result: # Se è stato trovato un utente
                     self.close()  # Chiude la finestra di login
-                    self.home_window = HomeWindow(self.username.text(), result[2])  # Crea una finestra per la home page
+                    self.home_window = HomeWindow(self.username.text(), result[3] + " " + result[4])  # Crea una finestra per la home page
                     self.home_window.show()  # Mostra la home page
                 else: # Altrimenti
                     self.error_message.show()  # Messaggio di errore

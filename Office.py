@@ -34,8 +34,8 @@ class OfficePage(QMainWindow):
         # Logo
         self.logo = QLabel()
         self.logo.setAlignment(Qt.AlignCenter)  # Allineamento al centro
-        self.pixmap = QPixmap("uniparthenope.png")  # Immagine logo
-        self.pixmap = self.pixmap.scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Ridimensiona l'immagine
+        self.pixmap = QPixmap("logo.png")  # Immagine logo
+        self.pixmap = self.pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)  # Ridimensiona l'immagine
         self.logo.setPixmap(self.pixmap)
 
         # Pulsante di inserimento di un appello
