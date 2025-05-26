@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QTableWidget, QTa
     QHeaderView, QMessageBox
 from datetime import datetime
 from mysql.connector import Error
+
 from DatabaseConnection import connection
 
 
@@ -16,7 +17,6 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
 
         # Finestra
         self.setWindowTitle("Prenotazione Appelli")  # Titolo della finestra
-        # self.setFixedSize(800, 600)  # Dimensioni della finestra
         self.setStyleSheet("background-color: white; font-family: Helvetica")  # Stile della finestra
         self.showFullScreen()  # Schermo intero
 
@@ -33,56 +33,68 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
 
         self.book_exam() # Mostra gli appelli prenotabili
 
-        # Tabella
-        self.table = QTableWidget()
-        self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["Esame", "Corso", "Data"])
-        self.table.setRowCount(len(self.available_exams))
+        # Layout
+        self.layout = QVBoxLayout()
+        self.layout.setAlignment(Qt.AlignCenter)  # Allineamento al centro di ogni widget
+        self.layout.setSpacing(20)  # Spaziatura tra i widget
+        self.layout.insertWidget(0, self.header_label)
 
-        # Ridimensionamento uniforme delle colonne
-        header = self.table.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.Stretch)
+        if not self.available_exams: # Se non ci sono appelli prenotabili
+            no_exams_label = QLabel("Nessun appello disponibile per la prenotazione.")
+            no_exams_label.setAlignment(Qt.AlignCenter)
+            no_exams_label.setStyleSheet("font-size: 20px; color: #888; margin: 40px;")
+            self.layout.addWidget(no_exams_label)
+        else:
+            self.table = QTableWidget()
+            self.table.setColumnCount(3)
+            self.table.setHorizontalHeaderLabels(["Esame", "Corso", "Data"])
+            self.table.setRowCount(len(self.available_exams))
 
-        # Popolamento della tabella
-        for row_index, exam in enumerate(self.available_exams):
-            for col_index, value in enumerate(exam):
-                if col_index == 2:
-                    value = datetime.strptime(value, "%Y-%m-%d").strftime("%d-%m-%Y") if isinstance(value,
-                            str) else value.strftime("%d-%m-%Y")
-                item = QTableWidgetItem(str(value))
-                item.setTextAlignment(Qt.AlignCenter)
-                self.table.setItem(row_index, col_index, item)
+            # Ridimensionamento uniforme delle colonne
+            header = self.table.horizontalHeader()
+            header.setSectionResizeMode(QHeaderView.Stretch)
 
-        # Stile tabella
-        self.table.setStyleSheet("""
-            QTableWidget {
-                border: 1px solid #cccccc;
-                background-color: #ffffff;
-                color: #333333;
-                gridline-color: #cccccc;
-                alternate-background-color: #f9f9f9;
-            }
-            QHeaderView::section {
-                background-color: #00796b;
-                color: white;
-                font-weight: bold;
-                padding: 4px;
-                border: 1px solid #cccccc;
-            }
-            QTableWidget::item {
-                padding: 5px;
-                border: 1px solid #cccccc;
-            }
-            QTableWidget::item:selected {
-                background-color: #c8e6c9;
-                color: #333333;
-            }
-        """)
-        self.table.setAlternatingRowColors(True)  # Abilita i colori alternati
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)  # Impedisce la modifica dei dati
-        self.table.setSelectionBehavior(QTableWidget.SelectRows)  # Seleziona intere righe
-        self.table.verticalHeader().setVisible(False)  # Nasconde l'indice delle righe
-        self.table.cellClicked.connect(self.confirm_booking)  # Collega la funzione di prenotazione al click della cella
+            # Popolamento della tabella
+            for row_index, exam in enumerate(self.available_exams):
+                for col_index, value in enumerate(exam):
+                    if col_index == 2:
+                        value = datetime.strptime(value, "%Y-%m-%d").strftime("%d-%m-%Y") if isinstance(value,
+                                str) else value.strftime("%d-%m-%Y")
+                    item = QTableWidgetItem(str(value))
+                    item.setTextAlignment(Qt.AlignCenter)
+                    self.table.setItem(row_index, col_index, item)
+
+            # Stile tabella
+            self.table.setStyleSheet("""
+                QTableWidget {
+                    border: 1px solid #cccccc;
+                    background-color: #ffffff;
+                    color: #333333;
+                    gridline-color: #cccccc;
+                    alternate-background-color: #f9f9f9;
+                }
+                QHeaderView::section {
+                    background-color: #00796b;
+                    color: white;
+                    font-weight: bold;
+                    padding: 4px;
+                    border: 1px solid #cccccc;
+                }
+                QTableWidget::item {
+                    padding: 5px;
+                    border: 1px solid #cccccc;
+                }
+                QTableWidget::item:selected {
+                    background-color: #c8e6c9;
+                    color: #333333;
+                }
+            """)
+            self.table.setAlternatingRowColors(True)  # Abilita i colori alternati
+            self.table.setEditTriggers(QTableWidget.NoEditTriggers)  # Impedisce la modifica dei dati
+            self.table.setSelectionBehavior(QTableWidget.SelectRows)  # Seleziona intere righe
+            self.table.verticalHeader().setVisible(False)  # Nasconde l'indice delle righe
+            self.table.cellClicked.connect(self.confirm_booking)  # Collega la funzione di prenotazione al click della cella
+            self.layout.addWidget(self.table)
 
         # Pulsante per tornare alla home page
         self.back_button = QPushButton("Esci")
@@ -107,14 +119,6 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
             }
         """)  # Stile del bottone
 
-        # Layout
-        self.layout = QVBoxLayout()
-        self.layout.setAlignment(Qt.AlignCenter)  # Allineamento al centro di ogni widget
-        self.layout.setSpacing(20)  # Spaziatura tra i widget
-
-        # Aggiunta dei widget al layout
-        self.layout.insertWidget(0, self.header_label)
-        self.layout.addWidget(self.table)
         self.layout.addWidget(self.back_button, alignment=Qt.AlignCenter)
         self.window = QWidget()
         self.window.setLayout(self.layout)
@@ -156,7 +160,6 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
         confirmation.setWindowTitle("Prenotazione Appello")
         confirmation.setIcon(QMessageBox.Question)
         confirmation.setText(
-            f"<p style='font-size:16px; color:#333333;'>"
             f"Confermi la prenotazione per:\n"
             f"Esame: {exam_name}\n"
             f"Corso: {course_name}\n"
@@ -167,13 +170,13 @@ class BookingPage(QMainWindow): # Finestra di prenotazione degli appelli
             QMessageBox {
                 background-color: #ffffff;
                 color: #333333;
-                font-family: Helvetica, Arial, sans-serif;
+                font-family: Helvetica;
                 font-size: 14px;
                 border: 1px solid #cccccc;
             }
             QMessageBox QPushButton {
                 background-color: #00796b;
-                color: white;  # Imposta il colore del testo a bianco
+                color: white;
                 font-weight: bold;
                 border: 1px solid #00796b;
                 border-radius: 5px;

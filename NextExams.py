@@ -170,9 +170,7 @@ class NextExamsPage(QMainWindow): # Finestra di visualizzazione degli appelli pr
         # Messaggio di conferma
         confirmation = QMessageBox(self)
         confirmation.setWindowTitle("Conferma")
-        confirmation.setText(f"<p style='font-size:16px; color:#333333;'>"
-                             f"Vuoi davvero annullare la prenotazione per <b>'{exam_name}'</b> del corso <b>'{course_name}'</b>?"
-                             f"</p>")
+        confirmation.setText(f"Vuoi davvero annullare la prenotazione per <b>'{exam_name}'</b> del corso <b>'{course_name}'</b>?")
         # Aggiungi pulsanti personalizzati
         btn_yes = confirmation.addButton("Conferma", QMessageBox.YesRole)
         btn_no = confirmation.addButton("Annulla", QMessageBox.NoRole)

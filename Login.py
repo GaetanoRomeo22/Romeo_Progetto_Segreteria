@@ -16,13 +16,12 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.office_window = None # Finestra per la pagina della segreteria
 
         # Finestra
-        self.setWindowTitle("Login") # Titolo della finestra
-        # self.setFixedSize(800, 600) # Dimensioni della finestra
+        self.setWindowTitle("LOGIN") # Titolo della finestra
         self.setStyleSheet("background-color: white; font-family: Helvetica") # Stile della finestra
         self.showFullScreen() # Schermo intero
 
         # Intestazione
-        self.header_label = QLabel("Login")
+        self.header_label = QLabel("LOGIN")
         self.header_label.setAlignment(Qt.AlignCenter)
         self.header_label.setStyleSheet("""
             font-size: 28px;
@@ -45,7 +44,6 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         # Username
         self.username_label = QLabel("Matricola") # Etichetta per l'username
         self.username_label.setStyleSheet("color: #333; font-size: 18px; font-weight: bold;") # Stile della casella di username
-        # self.username_label.setAlignment(Qt.AlignCenter) # Allineamento al centro
         self.username = QLineEdit() # Casella di testo per l'username
         self.username.setPlaceholderText("Inserisci la tua matricola") # Placeholder
         self.username.setMaxLength(10) # Lunghezza massima del testo
@@ -68,7 +66,6 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         # Password
         self.password_label = QLabel("Password") # Etichetta per la password
         self.password_label.setStyleSheet("color: #333; font-size: 18px; font-weight: bold;")  # Stile della casella di password
-        # self.password_label.setAlignment(Qt.AlignCenter) # Allineamento al centro
         self.password = QLineEdit()  # Casella di testo per la password
         self.password.setPlaceholderText("Inserisci la tua password")  # Placeholder
         self.password.setMaxLength(30)  # Lunghezza massima del testo
@@ -161,28 +158,45 @@ class LoginWindow(QMainWindow): # Finestra di login personalizzata
         self.setCentralWidget(self.window)
 
     def login(self): # Funzione di login per lo studente
-        if self.username.text() == self.password.text() == "admin": # Se l'utente è della segreteria
+        self.error_message.hide()  # Nasconde il messaggio di errore all'inizio
+        self.login_button.setEnabled(False)  # Disabilita il pulsante di login per evitare clic multipli
+        matricola = self.username.text().strip()  # Prende la matricola inserita
+        password = self.password.text().strip() # Prende la password inserita
+        if not matricola or not password:  # Se la matricola o la password sono vuote
+            self.error_message.setText("Inserisci matricola e password")
+            self.error_message.show()
+            self.login_button.setEnabled(True)
+            return
+        if matricola == password == "admin": # Se l'utente è della segreteria
             self.office_window = OfficePage()  # Crea una finestra per la segreteria
             self.office_window.show()  # Mostra la pagina della segreteria
-        else: # Altrimenti
-            try:
-                conn = connection() # Connessione al database
-                cursor = conn.cursor() # Cursore per la query
-                query = "SELECT * FROM STUDENTI WHERE MATRICOLA = %s AND PASSWORD = %s" # Query da eseguire
-                cursor.execute(query, (self.username.text(), self.password.text())) # Esegue la query
-                result = cursor.fetchone() # Risultati della query
-                if result: # Se è stato trovato un utente
-                    self.close()  # Chiude la finestra di login
-                    self.home_window = HomeWindow(self.username.text(), result[3] + " " + result[4])  # Crea una finestra per la home page
-                    self.home_window.show()  # Mostra la home page
-                else: # Altrimenti
-                    self.error_message.show()  # Messaggio di errore
-            except Error as e:
-                print(f"Errore durante la connessione al database: {e}")
-            finally:
-                if conn.is_connected():
-                    cursor.close()  # Chiude il cursore
-                    conn.close()  # Chiude la connessione al database
+            self.login_button.setEnabled(True)
+            return
+        try:
+            conn = connection() # Connessione al database
+            if not conn: # Se la connessione al database non è riuscita
+                self.error_message.setText("Connessione al database fallita")
+                self.error_message.show()
+                return
+            cursor = conn.cursor() # Cursore per la query
+            query = "SELECT * FROM STUDENTI WHERE MATRICOLA = %s AND PASSWORD = %s" # Query da eseguire
+            cursor.execute(query, (self.username.text(), self.password.text())) # Esegue la query
+            result = cursor.fetchone() # Risultati della query
+            if result: # Se è stato trovato un utente
+                self.close()  # Chiude la finestra di login
+                self.home_window = HomeWindow(self.username.text(), result[3] + " " + result[4])  # Crea una finestra per la home page
+                self.home_window.show()  # Mostra la home page
+            else: # Altrimenti
+                self.error_message.setText("Matricola o password errati")
+                self.error_message.show()  # Messaggio di errore
+        except Error as e:
+            self.error_message.setText("Errore di connessione al database")
+            self.error_message.show()
+        finally:
+            self.login_button.setEnabled(True)
+            if conn.is_connected():
+                cursor.close()  # Chiude il cursore
+                conn.close()  # Chiude la connessione al database
 
     def toggle_password_visibility(self): # Funzione per mostrare/nascondere la password
         if self.password.echoMode() == QLineEdit.Password:
